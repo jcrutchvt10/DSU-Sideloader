@@ -1,0 +1,76 @@
+name: Recode Repository
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'URL of the repository to clone and recode'
+        required: true
+      prompt:
+        description: 'Prompt for AI recoding'
+        required: true
+
+jobs:
+  recode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clone repository
+        run: |
+          git clone ${{ github.event.inputs.repo_url }} repo_to_recode
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install openai
+
+      - name: Recode using AI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<EOF
+          import os
+          import openai
+          import glob
+          
+          openai.api_key = os.getenv("OPENAI_API_KEY")
+          
+          def recode_file(file_path, prompt):
+              with open(file_path, 'r') as file:
+                  content = file.read()
+              
+              response = openai.ChatCompletion.create(
+                  model="gpt-3.5-turbo",
+                  messages=[
+                      {"role": "system", "content": "You are a helpful assistant that recodes files based on prompts."},
+                      {"role": "user", "content": f"Recode the following file based on this prompt: {prompt}\n\nFile content:\n{content}"}
+                  ]
+              )
+              
+              return response.choices[0].message['content']
+          
+          prompt = "${{ github.event.inputs.prompt }}"
+          
+          for file_path in glob.glob('repo_to_recode/**/*', recursive=True):
+              if os.path.isfile(file_path):
+                  recoded_content = recode_file(file_path, prompt)
+                  with open(file_path, 'w') as file:
+                      file.write(recoded_content)
+          
+          print("Recoding complete.")
+          EOF
+
+      - name: Create ZIP artifact
+        run: zip -r recoded_repo.zip repo_to_recode
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: recoded_repo
+          path: recoded_repo.zip
