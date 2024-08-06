@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install openai
+          pip install openai-0.28
 
       - name: Recode using AI
         env:
