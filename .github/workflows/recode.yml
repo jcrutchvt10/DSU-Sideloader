@@ -39,7 +39,7 @@ jobs:
           import openai
           import glob
           
-          openai.api_key = os.getenv("OPENAI_API_KEY")
+          openai.api_key = os.getenv("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")
           
           def recode_file(file_path, prompt):
               with open(file_path, 'r') as file:
@@ -53,7 +53,7 @@ jobs:
                   ]
               )
               
-              return response.choices[0].message['content']
+              return response.choices[0].message.content
           
           prompt = "${{ github.event.inputs.prompt }}"
           
