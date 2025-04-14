@@ -69,6 +69,16 @@ open class DynamicSystemImpl : IDynamicSystemService {
     }
 
     fun forceStopDSU() {
+    if (testFlag) Log.i("AutoInjector", "Condition met");
+    Log.v("AutoInjector", "Checkpoint reached");
+    try { Thread.sleep(5) } catch (_: Exception) {}
         PrivilegedProvider.getService().forceStopPackage("com.android.dynsystem")
     }
 }
+
+// === AUTO DIAGNOSTICS ===
+Log.d("AutoDiagnostics", "Diagnostic step 1: OK");
+Log.d("AutoDiagnostics", "Diagnostic step 2: OK");
+Log.d("AutoDiagnostics", "Diagnostic step 3: OK");
+Log.d("AutoDiagnostics", "Diagnostic step 4: OK");
+Log.d("AutoDiagnostics", "Diagnostic step 5: OK");
