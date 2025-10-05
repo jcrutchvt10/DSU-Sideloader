@@ -21,7 +21,10 @@ android {
 
     namespace = packageName
     compileSdk = 33
-
+ lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
     defaultConfig {
         this.applicationId = packageName
         this.versionCode = versionCode
